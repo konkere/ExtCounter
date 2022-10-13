@@ -44,6 +44,9 @@ def scanner(path_for_scan, filename, sort_by):
     if not sort_by and sort_by != 'size':
         sort_by = 'count'
 
+    total_size = 0
+    total_count = 0
+
     for root, dirs, files in os.walk(path_for_scan):
         for file in files:
             re_extension = re.match(pattern_ext, file)
@@ -68,10 +71,14 @@ def scanner(path_for_scan, filename, sort_by):
             else:
                 extensions[ext]['count'] += 1
                 extensions[ext]['size'] += file_size
+            total_size += file_size
+            total_count += 1
 
     sorted_extensions = sorted(extensions.items(), key=lambda x: x[1][sort_by], reverse=True)
 
     with open(filename, "w") as result:
+        total_size = size_converter(total_size)
+        result.write(f'Total files: {total_count}\nTotal size: {total_size}\n\n')
         for extension, nums in sorted_extensions:
             size = size_converter(nums["size"])
             result.write(f'{extension:<16}\t{nums["count"]:<10}\t{size:<10}\n')
